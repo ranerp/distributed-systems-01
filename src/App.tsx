@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSlideNavigation } from './hooks/useSlideNavigation'
 import { SlideLayout } from './components/layout/SlideLayout'
+import { SlidePicker } from './components/nav/SlidePicker'
 import { SLIDES } from './data/slides'
 
 type SlideProps = { slideIndex: number; totalSlides: number }
@@ -22,7 +23,7 @@ function SlideShell({ slideIndex, totalSlides }: SlideProps) {
 }
 
 export function App() {
-  const { currentIndex, total, goNext, goPrev } = useSlideNavigation(SLIDES)
+  const { currentIndex, total, goNext, goPrev, goTo } = useSlideNavigation(SLIDES)
 
   return (
     <div className="w-full h-full relative overflow-hidden">
@@ -49,6 +50,8 @@ export function App() {
 
       <div className="absolute inset-y-0 left-0 w-16 cursor-w-resize z-10" onClick={goPrev} />
       <div className="absolute inset-y-0 right-0 w-16 cursor-e-resize z-10" onClick={goNext} />
+
+      <SlidePicker slides={SLIDES} currentIndex={currentIndex} goTo={goTo} />
     </div>
   )
 }

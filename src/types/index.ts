@@ -13,7 +13,7 @@ export type StepState = {
   isLast: boolean
 }
 
-export type NodeKind = 'producer' | 'queue' | 'consumer' | 'database' | 'service' | 'relay'
+export type NodeKind = 'producer' | 'queue' | 'consumer' | 'database' | 'service' | 'relay' | 'dlq'
 
 export type FlowNodeData = {
   label: string

@@ -35,6 +35,30 @@ const TAKEAWAYS = [
     emoji: '⚡',
     text: 'In-process calls are 1000× faster than network calls. Respect that budget.',
   },
+  {
+    emoji: '🔌',
+    text: 'Circuit breaker prevents cascading failures: open fast, probe slowly, reset on success.',
+  },
+  {
+    emoji: '☠️',
+    text: 'DLQ captures unprocessable messages after retry exhaustion — inspect and replay, never silently drop.',
+  },
+  {
+    emoji: '🔑',
+    text: 'Idempotency key = process each unique request exactly once, even under redelivery.',
+  },
+  {
+    emoji: '📜',
+    text: 'Event sourcing: the log never lies. Replay it for any past state or new projection.',
+  },
+  {
+    emoji: '🗺️',
+    text: 'CAP theorem: P is mandatory. Your real choice is C vs A during a network partition.',
+  },
+  {
+    emoji: '🔀',
+    text: 'Patches from DLQ corrupt state without per-field timestamps. Snapshots + seq numbers are the safe default.',
+  },
 ]
 
 export function SummarySlide() {

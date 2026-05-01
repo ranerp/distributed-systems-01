@@ -51,6 +51,16 @@ const ExponentialBackoffSlide = lazy(() =>
     default: m.ExponentialBackoffSlide,
   })),
 )
+const DeadLetterQueueSlide = lazy(() =>
+  import('../components/slides/DeadLetterQueueSlide').then((m) => ({
+    default: m.DeadLetterQueueSlide,
+  })),
+)
+const CircuitBreakerSlide = lazy(() =>
+  import('../components/slides/CircuitBreakerSlide').then((m) => ({
+    default: m.CircuitBreakerSlide,
+  })),
+)
 const OutboxPatternSlide = lazy(() =>
   import('../components/slides/OutboxPatternSlide').then((m) => ({
     default: m.OutboxPatternSlide,
@@ -64,9 +74,34 @@ const LogicalClocksSlide = lazy(() =>
     default: m.LogicalClocksSlide,
   })),
 )
+const IdempotencySlide = lazy(() =>
+  import('../components/slides/IdempotencySlide').then((m) => ({
+    default: m.IdempotencySlide,
+  })),
+)
+const EventSourcingSlide = lazy(() =>
+  import('../components/slides/EventSourcingSlide').then((m) => ({
+    default: m.EventSourcingSlide,
+  })),
+)
 const PatchVsSnapshotSlide = lazy(() =>
   import('../components/slides/PatchVsSnapshotSlide').then((m) => ({
     default: m.PatchVsSnapshotSlide,
+  })),
+)
+const PatchOrderingSlide = lazy(() =>
+  import('../components/slides/PatchOrderingSlide').then((m) => ({
+    default: m.PatchOrderingSlide,
+  })),
+)
+const CAPTheoremSlide = lazy(() =>
+  import('../components/slides/CAPTheoremSlide').then((m) => ({
+    default: m.CAPTheoremSlide,
+  })),
+)
+const CAPInteractiveSlide = lazy(() =>
+  import('../components/slides/CAPInteractiveSlide').then((m) => ({
+    default: m.CAPInteractiveSlide,
   })),
 )
 const LatencyComparisonSlide = lazy(() =>
@@ -152,6 +187,18 @@ export const SLIDES: SlideConfig[] = [
     isInteractive: false,
   },
   {
+    id: 'dead-letter-queue',
+    chapter: 'Chapter 2 — Failure & Ordering',
+    component: DeadLetterQueueSlide,
+    isInteractive: true,
+  },
+  {
+    id: 'circuit-breaker',
+    chapter: 'Chapter 2 — Failure & Ordering',
+    component: CircuitBreakerSlide,
+    isInteractive: true,
+  },
+  {
     id: 'outbox-pattern',
     chapter: 'Chapter 3 — Patterns',
     component: OutboxPatternSlide,
@@ -167,12 +214,42 @@ export const SLIDES: SlideConfig[] = [
     id: 'logical-clocks',
     chapter: 'Chapter 3 — Patterns',
     component: LogicalClocksSlide,
-    isInteractive: false,
+    isInteractive: true,
+  },
+  {
+    id: 'idempotency',
+    chapter: 'Chapter 3 — Patterns',
+    component: IdempotencySlide,
+    isInteractive: true,
+  },
+  {
+    id: 'event-sourcing',
+    chapter: 'Chapter 3 — Patterns',
+    component: EventSourcingSlide,
+    isInteractive: true,
   },
   {
     id: 'patch-vs-snapshot',
     chapter: 'Chapter 4 — Architecture',
     component: PatchVsSnapshotSlide,
+    isInteractive: true,
+  },
+  {
+    id: 'patch-ordering',
+    chapter: 'Chapter 4 — Architecture',
+    component: PatchOrderingSlide,
+    isInteractive: true,
+  },
+  {
+    id: 'cap-theorem',
+    chapter: 'Chapter 4 — Architecture',
+    component: CAPTheoremSlide,
+    isInteractive: false,
+  },
+  {
+    id: 'cap-interactive',
+    chapter: 'Chapter 4 — Architecture',
+    component: CAPInteractiveSlide,
     isInteractive: true,
   },
   {

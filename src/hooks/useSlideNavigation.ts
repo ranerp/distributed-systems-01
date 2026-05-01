@@ -10,23 +10,48 @@ type SlideNavigation = {
   goTo: (index: number) => void
 }
 
+function readIndexFromUrl(slides: SlideConfig[]): number {
+  const id = new URLSearchParams(window.location.search).get('slide')
+  if (!id) return 0
+  const idx = slides.findIndex((s) => s.id === id)
+  return idx === -1 ? 0 : idx
+}
+
+function writeIndexToUrl(slides: SlideConfig[], index: number) {
+  const params = new URLSearchParams(window.location.search)
+  params.set('slide', slides[index].id)
+  history.replaceState(null, '', `?${params.toString()}`)
+}
+
 export function useSlideNavigation(slides: SlideConfig[]): SlideNavigation {
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const [currentIndex, setCurrentIndex] = useState(() => readIndexFromUrl(slides))
+
+  const navigate = useCallback(
+    (index: number) => {
+      const clamped = Math.max(0, Math.min(index, slides.length - 1))
+      setCurrentIndex(clamped)
+      writeIndexToUrl(slides, clamped)
+    },
+    [slides],
+  )
 
   const goNext = useCallback(() => {
-    setCurrentIndex((i) => Math.min(i + 1, slides.length - 1))
-  }, [slides.length])
+    setCurrentIndex((i) => {
+      const next = Math.min(i + 1, slides.length - 1)
+      writeIndexToUrl(slides, next)
+      return next
+    })
+  }, [slides])
 
   const goPrev = useCallback(() => {
-    setCurrentIndex((i) => Math.max(i - 1, 0))
-  }, [])
+    setCurrentIndex((i) => {
+      const prev = Math.max(i - 1, 0)
+      writeIndexToUrl(slides, prev)
+      return prev
+    })
+  }, [slides])
 
-  const goTo = useCallback(
-    (index: number) => {
-      setCurrentIndex(Math.max(0, Math.min(index, slides.length - 1)))
-    },
-    [slides.length],
-  )
+  const goTo = useCallback((index: number) => navigate(index), [navigate])
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {

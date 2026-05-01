@@ -10,6 +10,7 @@ const ICONS: Record<NodeKind, string> = {
   database: '🗄️',
   service: '⚙️',
   relay: '🔄',
+  dlq: '☠️',
 }
 
 const HIGHLIGHT_CLS: Record<Highlight, string> = {
