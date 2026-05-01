@@ -36,14 +36,14 @@ const ROWS: Row[] = [
 export function FifoSlide() {
   return (
     <div className="flex flex-col h-full gap-6 justify-center">
-      <h2 className="text-2xl font-bold text-white">FIFO — When do you actually get it?</h2>
+      <h2 className="text-2xl font-bold text-text">FIFO — When do you actually get it?</h2>
       <div className="rounded-lg border border-surface-2 overflow-hidden">
         <table className="w-full text-sm font-mono">
           <thead>
             <tr className="bg-surface-1 border-b border-surface-2">
-              <th className="text-left px-4 py-3 text-accent-blue">Scenario</th>
-              <th className="text-left px-4 py-3 text-accent-blue">FIFO?</th>
-              <th className="text-left px-4 py-3 text-accent-blue">Why</th>
+              <th className="text-left px-4 py-3 text-accent-gold">Scenario</th>
+              <th className="text-left px-4 py-3 text-accent-gold">FIFO?</th>
+              <th className="text-left px-4 py-3 text-accent-gold">Why</th>
             </tr>
           </thead>
           <tbody>
@@ -52,7 +52,7 @@ export function FifoSlide() {
                 key={row.scenario}
                 className={`border-b border-surface-2 ${i % 2 === 0 ? 'bg-surface-0' : 'bg-surface-1'}`}
               >
-                <td className="px-4 py-3 text-white">{row.scenario}</td>
+                <td className="px-4 py-3 text-text">{row.scenario}</td>
                 <td
                   className={`px-4 py-3 font-semibold ${row.fifo.startsWith('✓') ? 'text-accent-green' : 'text-accent-red'}`}
                 >

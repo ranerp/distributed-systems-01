@@ -69,9 +69,9 @@ export function CAPTheoremSlide() {
         <table className="w-full text-sm font-mono">
           <thead>
             <tr className="border-b border-surface-2 bg-surface-1">
-              <th className="text-left px-4 py-3 text-accent-blue font-semibold">System</th>
-              <th className="text-left px-4 py-3 text-accent-blue font-semibold">Trades Away</th>
-              <th className="text-left px-4 py-3 text-accent-blue font-semibold">Behavior</th>
+              <th className="text-left px-4 py-3 text-accent-gold font-semibold">System</th>
+              <th className="text-left px-4 py-3 text-accent-gold font-semibold">Trades Away</th>
+              <th className="text-left px-4 py-3 text-accent-gold font-semibold">Behavior</th>
             </tr>
           </thead>
           <tbody>
@@ -80,7 +80,7 @@ export function CAPTheoremSlide() {
                 key={row.system}
                 className={`border-b border-surface-2 ${i % 2 === 0 ? 'bg-surface-0' : 'bg-surface-1'}`}
               >
-                <td className="px-4 py-3 text-white font-semibold">{row.system}</td>
+                <td className="px-4 py-3 text-text font-semibold">{row.system}</td>
                 <td
                   className={`px-4 py-3 font-semibold ${row.trades.startsWith('CP') ? 'text-accent-blue' : row.trades.startsWith('AP') ? 'text-accent-green' : 'text-surface-3'}`}
                 >

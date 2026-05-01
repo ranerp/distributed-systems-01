@@ -11,7 +11,7 @@ type Props = {
 export function SlideContent({ title, annotation, caption, children }: Props) {
   return (
     <div className="flex flex-col h-full">
-      <h2 className="text-3xl font-bold text-white text-center shrink-0 pb-4">{title}</h2>
+      <h2 className="text-3xl font-bold text-text text-center shrink-0 pb-4">{title}</h2>
 
       {/* Canvas + annotation centered together as one visual unit */}
       <div className="flex-1 flex flex-col items-center justify-center min-h-0 w-full overflow-hidden gap-4">
@@ -23,7 +23,7 @@ export function SlideContent({ title, annotation, caption, children }: Props) {
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
-              className="text-accent-blue text-base font-mono max-w-3xl text-center shrink-0"
+              className="text-accent-blue text-lg font-mono max-w-3xl text-center shrink-0"
             >
               {annotation}
             </motion.p>

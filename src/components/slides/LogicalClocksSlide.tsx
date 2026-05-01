@@ -150,11 +150,11 @@ export function LogicalClocksSlide({ slideIndex, totalSlides }: Props) {
           <div className="flex gap-12 justify-center font-mono text-sm">
             <div className="flex items-center gap-3 rounded border border-surface-2 bg-surface-1 px-5 py-2">
               <span className="text-surface-3">Node A</span>
-              <span className="text-accent-blue font-bold">t = {step.clockA}</span>
+              <span className="text-accent-teal font-bold">t = {step.clockA}</span>
             </div>
             <div className="flex items-center gap-3 rounded border border-surface-2 bg-surface-1 px-5 py-2">
               <span className="text-surface-3">Node B</span>
-              <span className="text-accent-blue font-bold">t = {step.clockB}</span>
+              <span className="text-accent-teal font-bold">t = {step.clockB}</span>
             </div>
           </div>
         </div>

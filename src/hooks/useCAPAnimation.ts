@@ -148,7 +148,11 @@ export type CAPAnimState = {
   reset: () => void
 }
 
-function buildState(mode: CAPMode, frame: Frame, systemName?: string): Omit<CAPAnimState, 'currentStep' | 'totalSteps' | 'isLast' | 'next' | 'reset'> {
+function buildState(
+  mode: CAPMode,
+  frame: Frame,
+  systemName?: string,
+): Omit<CAPAnimState, 'currentStep' | 'totalSteps' | 'isLast' | 'next' | 'reset'> {
   if (mode === 'CA') {
     return {
       nodes: [
@@ -223,8 +227,8 @@ export function useCAPAnimation(mode: CAPMode | null, systemName?: string): CAPA
 
   useEffect(() => {
     reset()
-  // reset when the selected system changes
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // reset when the selected system changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, systemName])
 
   const visual = useMemo(() => {

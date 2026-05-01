@@ -34,19 +34,24 @@ export function SlidePicker({ slides, currentIndex, goTo }: Props) {
   const chapters = groupByChapter(slides)
 
   useEffect(() => {
-    if (!open) return
     function onKey(e: KeyboardEvent) {
+      if (e.key === 'g' || e.key === 'G') {
+        if (e.target instanceof HTMLButtonElement || e.target instanceof HTMLInputElement) return
+        setOpen((o) => !o)
+      }
       if (e.key === 'Escape') setOpen(false)
     }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  useEffect(() => {
+    if (!open) return
     function onMouseDown(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
     }
-    window.addEventListener('keydown', onKey)
     document.addEventListener('mousedown', onMouseDown)
-    return () => {
-      window.removeEventListener('keydown', onKey)
-      document.removeEventListener('mousedown', onMouseDown)
-    }
+    return () => document.removeEventListener('mousedown', onMouseDown)
   }, [open])
 
   return (
@@ -82,7 +87,7 @@ export function SlidePicker({ slides, currentIndex, goTo }: Props) {
 
       <button
         onClick={() => setOpen((o) => !o)}
-        title="Slide overview"
+        title="Slide overview (G)"
         className={`w-7 h-7 rounded border flex items-center justify-center font-mono text-[11px] transition-colors ${
           open
             ? 'bg-surface-2 border-surface-3 text-text'

@@ -10,7 +10,7 @@ export function StepControls({ currentStep, totalSteps, isLast, onNext, onReset 
   return (
     <div className="flex items-center gap-3">
       <span className="text-xs text-surface-3 font-mono">
-        step {currentStep + 1}/{totalSteps}
+        step {currentStep + 1} / {totalSteps}
       </span>
       {isLast ? (
         <button

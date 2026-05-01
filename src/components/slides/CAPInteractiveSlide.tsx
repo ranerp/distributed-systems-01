@@ -53,10 +53,14 @@ export function CAPInteractiveSlide({ slideIndex, totalSlides }: Props) {
   const [active, setActive] = useState<System | null>(null)
   const [dragging, setDragging] = useState<string | null>(null)
 
-  const { currentStep, totalSteps, isLast, next, reset: resetSteps, ...anim } = useCAPAnimation(
-    active?.mode ?? null,
-    active?.name,
-  )
+  const {
+    currentStep,
+    totalSteps,
+    isLast,
+    next,
+    reset: resetSteps,
+    ...anim
+  } = useCAPAnimation(active?.mode ?? null, active?.name)
 
   const handleDragStart = useCallback((e: React.DragEvent, sys: System) => {
     e.dataTransfer.setData('application/json', JSON.stringify(sys))
@@ -87,16 +91,18 @@ export function CAPInteractiveSlide({ slideIndex, totalSlides }: Props) {
       chapter="Chapter 4 — Architecture"
       slideIndex={slideIndex}
       totalSlides={totalSlides}
-      stepState={mode ? { currentStep, totalSteps, isLast, onNext: next, onReset: reset } : undefined}
+      stepState={
+        mode ? { currentStep, totalSteps, isLast, onNext: next, onReset: reset } : undefined
+      }
     >
       <div className="flex flex-col h-full gap-3">
-        <h2 className="text-2xl font-bold text-white shrink-0">
+        <h2 className="text-2xl font-bold text-text shrink-0">
           CAP Theorem — Interactive Partition Demo
         </h2>
 
         <div className="flex-1 flex gap-6 min-h-0">
           {/* Left: triangle + chip tray */}
-          <div className="flex flex-col gap-3 shrink-0 w-[380px]">
+          <div className="flex flex-col gap-3 shrink-0 w-[380px] justify-center">
             <div
               className="relative rounded-lg border border-surface-2 bg-surface-1 cursor-crosshair"
               style={{ width: 380, height: 270 }}
@@ -329,7 +335,7 @@ export function CAPInteractiveSlide({ slideIndex, totalSlides }: Props) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.3 }}
-                    className="font-mono text-base text-center max-w-lg shrink-0"
+                    className="font-mono text-lg text-center max-w-lg shrink-0"
                     style={{ color: MODE_COLOR[mode] }}
                   >
                     {anim.annotation}

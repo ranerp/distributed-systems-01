@@ -55,7 +55,7 @@ const HEADERS: Record<keyof Row, string> = {
 export function BrokerComparisonSlide() {
   return (
     <div className="flex flex-col h-full gap-6 justify-center">
-      <h2 className="text-2xl font-bold text-white">
+      <h2 className="text-2xl font-bold text-text">
         Message Brokers — What are we choosing between?
       </h2>
       <div className="overflow-x-auto rounded-lg border border-surface-2">
@@ -63,7 +63,7 @@ export function BrokerComparisonSlide() {
           <thead>
             <tr className="border-b border-surface-2 bg-surface-1">
               {COLS.map((col) => (
-                <th key={col} className="text-left px-4 py-3 text-accent-blue font-semibold">
+                <th key={col} className="text-left px-4 py-3 text-accent-gold font-semibold">
                   {HEADERS[col]}
                 </th>
               ))}
@@ -78,7 +78,7 @@ export function BrokerComparisonSlide() {
                 {COLS.map((col) => (
                   <td
                     key={col}
-                    className={`px-4 py-3 ${col === 'broker' ? 'text-white font-semibold' : 'text-surface-3'}`}
+                    className={`px-4 py-3 ${col === 'broker' ? 'text-text font-semibold' : 'text-surface-3'}`}
                   >
                     {row[col]}
                   </td>

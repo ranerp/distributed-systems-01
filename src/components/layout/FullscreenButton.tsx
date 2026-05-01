@@ -6,10 +6,10 @@ export function FullscreenButton() {
   return (
     <button
       onClick={toggle}
-      className="text-xs text-surface-3 hover:text-white transition-colors px-2 py-1 rounded border border-surface-3 hover:border-white"
+      className="text-xs text-surface-3 hover:text-text transition-colors px-2 py-1 rounded border border-surface-2 hover:border-surface-3 font-mono"
       title={isFullscreen ? 'Exit fullscreen (F)' : 'Fullscreen (F)'}
     >
-      {isFullscreen ? '⛶' : '⛶'}
+      {isFullscreen ? '⊡' : '⛶'}
     </button>
   )
 }
