@@ -20,7 +20,7 @@ export function RabbitMQOrderingSlide({ slideIndex, totalSlides }: Props) {
       <SlideContent
         title="RabbitMQ — When Order Breaks"
         annotation={annotation}
-        caption="prefetch=1 for strict order · no async handlers when order matters · partition queue by key for ordered competing consumers"
+        caption="prefetch=1 for strict order · no async handlers when order matters · use consistent-hash exchange or separate queues per key for ordered competing consumers"
       >
         <FitCanvas naturalWidth={CANVAS_W} naturalHeight={CANVAS_H}>
           <AnimatedFlowCanvas
