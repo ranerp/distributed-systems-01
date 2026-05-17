@@ -19,7 +19,7 @@ const STEPS: IdempotencyStep[] = [
     consumerAction: 'idle',
     activeKey: null,
     annotation:
-      'Idempotency key: a client-supplied token that uniquely identifies a request. Process each key exactly once.',
+      'True exactly-once delivery is impossible in distributed systems. Idempotency keys give you the next best thing: at-least-once delivery + dedup = effectively-once processing.',
   },
   {
     messages: [{ id: 'm1', key: 'txn-abc-123', attempt: 1, status: 'arriving' }],

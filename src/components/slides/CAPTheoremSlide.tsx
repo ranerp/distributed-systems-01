@@ -70,7 +70,7 @@ export function CAPTheoremSlide() {
           <thead>
             <tr className="border-b border-surface-2 bg-surface-1">
               <th className="text-left px-4 py-3 text-accent-gold font-semibold">System</th>
-              <th className="text-left px-4 py-3 text-accent-gold font-semibold">Trades Away</th>
+              <th className="text-left px-4 py-3 text-accent-gold font-semibold">Chooses</th>
               <th className="text-left px-4 py-3 text-accent-gold font-semibold">Behavior</th>
             </tr>
           </thead>

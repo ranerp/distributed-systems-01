@@ -32,7 +32,7 @@ export function IdempotencySlide({ slideIndex, totalSlides }: Props) {
       stepState={{ currentStep, totalSteps, isLast, onNext: next, onReset: reset }}
     >
       <SlideContent
-        title="Idempotency Keys — Exactly-Once Semantics"
+        title="Idempotency Keys — Achieving Effectively-Once Processing"
         annotation={step.annotation}
         caption="Store key + result atomically in the same transaction · use UUID v4 or hash(payload) as key · TTL keys after retention window"
       >
