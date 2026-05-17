@@ -1,9 +1,14 @@
 import type { ComponentType } from 'react'
 
+export type SlideProps = {
+  slideIndex: number
+  totalSlides: number
+}
+
 export type SlideConfig = {
   id: string
   chapter: string
-  component: ComponentType
+  component: ComponentType<SlideProps>
   isInteractive: boolean
 }
 

@@ -4,8 +4,7 @@ import { useSlideNavigation } from './hooks/useSlideNavigation'
 import { SlideLayout } from './components/layout/SlideLayout'
 import { SlidePicker } from './components/nav/SlidePicker'
 import { SLIDES } from './data/slides'
-
-type SlideProps = { slideIndex: number; totalSlides: number }
+import type { SlideProps } from './types'
 
 class SlideErrorBoundary extends Component<
   { slideIndex: number; chapter: string; children: ReactNode },
@@ -46,7 +45,7 @@ class SlideErrorBoundary extends Component<
 
 function SlideShell({ slideIndex, totalSlides }: SlideProps) {
   const slide = SLIDES[slideIndex]
-  const Component = slide.component as React.ComponentType<SlideProps>
+  const Component = slide.component
 
   if (slide.isInteractive) {
     return <Component slideIndex={slideIndex} totalSlides={totalSlides} />

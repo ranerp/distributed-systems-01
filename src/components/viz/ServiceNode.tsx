@@ -9,6 +9,7 @@ const ICONS: Record<NodeKind, string> = {
   database: '🗄️',
   service: '⚙️',
   relay: '🔄',
+  dlq: '☠️',
 }
 
 const HIGHLIGHT_CLASSES: Record<NonNullable<FlowNodeData['highlight']>, string> = {
