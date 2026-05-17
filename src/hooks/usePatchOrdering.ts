@@ -1,11 +1,17 @@
 import { useMemo } from 'react'
 import { useSteppedAnimation } from './useSteppedAnimation'
 import { nodeCenter } from '../components/viz/canvasUtils'
-import type { CanvasNode, CanvasEdge, FlyingMsg, Highlight } from '../components/viz/canvasUtils'
+import type {
+  CanvasNode,
+  CanvasEdge,
+  FlyingMsg,
+  Highlight,
+  DockedMsg,
+} from '../components/viz/canvasUtils'
 import type { NodeKind } from '../types'
 
 export const CANVAS_W = 840
-export const CANVAS_H = 260
+export const CANVAS_H = 290
 
 const BLUE = '#56a8f5'
 const RED = '#f85149'
@@ -25,15 +31,14 @@ const BASE_EDGES: CanvasEdge[] = [
   { id: 'dlq-m', from: 'dlq', to: 'mirror', color: ORANGE },
 ]
 
-const sourceC = nodeCenter(20, 73)
-const brokerC = nodeCenter(280, 73)
-const mirrorC = nodeCenter(560, 73)
 const dlqC = nodeCenter(280, 180)
+const mirrorC = nodeCenter(560, 73)
 
 export type PatchOrderingStep = {
   highlights: Record<string, 'success' | 'error' | 'warning' | 'idle'>
   activeEdges: string[]
   messages: FlyingMsg[]
+  dockedMsgs: Record<string, DockedMsg[]>
   mirrorState: Record<string, string>
   mirrorDrifted: boolean
   annotation: string
@@ -44,6 +49,7 @@ const STEPS: PatchOrderingStep[] = [
     highlights: { source: 'idle', broker: 'idle', mirror: 'idle', dlq: 'idle' },
     activeEdges: [],
     messages: [],
+    dockedMsgs: {},
     mirrorState: { email: 'alice@co.com', role: 'user', plan: 'pro' },
     mirrorDrifted: false,
     annotation:
@@ -52,7 +58,8 @@ const STEPS: PatchOrderingStep[] = [
   {
     highlights: { source: 'success', broker: 'idle', mirror: 'idle', dlq: 'idle' },
     activeEdges: ['s-b'],
-    messages: [{ id: 'M1', ...sourceC, color: BLUE, label: 'M1', visible: true }],
+    messages: [],
+    dockedMsgs: { source: [{ label: 'M1', color: BLUE }] },
     mirrorState: { email: 'alice@co.com', role: 'user', plan: 'pro' },
     mirrorDrifted: false,
     annotation: "Source updates email → sends M1: PATCH {email: 'alice@new.com'}",
@@ -60,7 +67,8 @@ const STEPS: PatchOrderingStep[] = [
   {
     highlights: { source: 'idle', broker: 'warning', mirror: 'idle', dlq: 'error' },
     activeEdges: ['b-dlq'],
-    messages: [{ id: 'M1', ...dlqC, color: RED, label: 'M1', visible: true }],
+    messages: [],
+    dockedMsgs: { dlq: [{ label: 'M1', color: RED }] },
     mirrorState: { email: 'alice@co.com', role: 'user', plan: 'pro' },
     mirrorDrifted: false,
     annotation: 'M1 reaches broker but Mirror consumer crashes. M1 routed to Dead Letter Queue.',
@@ -68,7 +76,8 @@ const STEPS: PatchOrderingStep[] = [
   {
     highlights: { source: 'idle', broker: 'warning', mirror: 'success', dlq: 'idle' },
     activeEdges: ['b-m'],
-    messages: [{ id: 'M2', ...mirrorC, color: BLUE, label: 'M2', visible: true }],
+    messages: [],
+    dockedMsgs: { dlq: [{ label: 'M1', color: RED }], mirror: [{ label: 'M2', color: BLUE }] },
     mirrorState: { email: 'alice@other.com', role: 'admin', plan: 'pro' },
     mirrorDrifted: false,
     annotation:
@@ -77,7 +86,8 @@ const STEPS: PatchOrderingStep[] = [
   {
     highlights: { source: 'idle', broker: 'idle', mirror: 'success', dlq: 'idle' },
     activeEdges: ['b-m'],
-    messages: [{ id: 'M3', ...mirrorC, color: BLUE, label: 'M3', visible: true }],
+    messages: [],
+    dockedMsgs: { dlq: [{ label: 'M1', color: RED }], mirror: [{ label: 'M3', color: BLUE }] },
     mirrorState: { email: 'alice@other.com', role: 'admin', plan: 'enterprise' },
     mirrorDrifted: false,
     annotation: "M3: PATCH {plan: 'enterprise'} arrives and applies. Mirror has processed M2 + M3.",
@@ -95,6 +105,7 @@ const STEPS: PatchOrderingStep[] = [
         visible: true,
       },
     ],
+    dockedMsgs: {},
     mirrorState: { email: 'alice@other.com', role: 'admin', plan: 'enterprise' },
     mirrorDrifted: false,
     annotation: 'M1 exits DLQ and replays toward Mirror. M1 was generated from state before M2/M3.',
@@ -103,6 +114,7 @@ const STEPS: PatchOrderingStep[] = [
     highlights: { source: 'idle', broker: 'idle', mirror: 'error', dlq: 'idle' },
     activeEdges: [],
     messages: [],
+    dockedMsgs: { mirror: [{ label: 'M1', color: ORANGE }] },
     mirrorState: { email: 'alice@new.com', role: 'admin', plan: 'enterprise' },
     mirrorDrifted: true,
     annotation:
@@ -112,6 +124,7 @@ const STEPS: PatchOrderingStep[] = [
     highlights: { source: 'idle', broker: 'idle', mirror: 'idle', dlq: 'idle' },
     activeEdges: [],
     messages: [],
+    dockedMsgs: {},
     mirrorState: { email: 'alice@new.com', role: 'admin', plan: 'enterprise' },
     mirrorDrifted: true,
     annotation:
@@ -139,6 +152,7 @@ export function usePatchOrdering(): Result {
       BASE_NODES.map((n) => ({
         ...n,
         highlight: (step.highlights[n.id] ?? 'idle') as Highlight,
+        dockedMsgs: step.dockedMsgs[n.id],
       })),
     [step],
   )

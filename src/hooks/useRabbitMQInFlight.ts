@@ -1,14 +1,11 @@
 import { useMemo } from 'react'
 import { useSteppedAnimation } from './useSteppedAnimation'
-import { nodeCenter, NODE_W, NODE_H } from '../components/viz/canvasUtils'
-import type { CanvasNode, CanvasEdge, FlyingMsg } from '../components/viz/canvasUtils'
+import { nodeCenter } from '../components/viz/canvasUtils'
+import type { CanvasNode, CanvasEdge, FlyingMsg, DockedMsg } from '../components/viz/canvasUtils'
 import type { NodeKind } from '../types'
 
-void NODE_W
-void NODE_H
-
 export const CANVAS_W = 820
-export const CANVAS_H = 180
+export const CANVAS_H = 200
 
 const BLUE = '#56a8f5'
 const GREEN = '#6aab73'
@@ -21,16 +18,10 @@ const BASE = [
 
 const EDGES: CanvasEdge[] = [{ id: 'q-c', from: 'queue', to: 'consumer', color: BLUE }]
 
-function ctr(id: string, dx = 0, dy = 0) {
-  const n = BASE.find((b) => b.id === id)!
-  const c = nodeCenter(n.x, n.y)
-  return { x: c.x + dx, y: c.y + dy }
-}
-
-const qC = ctr('queue')
-const cC = ctr('consumer')
-function along(t: number, dy = 0) {
-  return { x: qC.x + t * (cC.x - qC.x), y: qC.y + t * (cC.y - qC.y) + dy }
+const qC = nodeCenter(80, 63)
+const cC = nodeCenter(610, 63)
+function along(t: number) {
+  return { x: qC.x + t * (cC.x - qC.x), y: qC.y + t * (cC.y - qC.y) }
 }
 
 type Highlight = 'success' | 'error' | 'warning' | 'idle'
@@ -41,6 +32,7 @@ type Step = {
   badges: Record<string, string[]>
   activeEdges: string[]
   msgs: FlyingMsg[]
+  dockedMsgs: Record<string, DockedMsg[]>
 }
 
 const STEPS: Step[] = [
@@ -48,55 +40,81 @@ const STEPS: Step[] = [
     annotation:
       'Without prefetch_count, broker floods consumer with all messages at once — set it!',
     highlights: { queue: 'warning', consumer: 'idle' },
-    badges: { queue: ['M1', 'M2', 'M3', 'M4', 'M5'], consumer: ['prefetch=3'] },
+    badges: { consumer: ['prefetch=3'] },
     activeEdges: [],
     msgs: [],
+    dockedMsgs: {
+      queue: [
+        { label: 'M1', color: BLUE },
+        { label: 'M2', color: BLUE },
+        { label: 'M3', color: BLUE },
+        { label: 'M4', color: BLUE },
+        { label: 'M5', color: BLUE },
+      ],
+    },
   },
   {
     annotation: 'Broker pushes M1, M2, M3 — window full, M4 and M5 held back until an ACK arrives',
     highlights: { queue: 'warning', consumer: 'warning' },
-    badges: { queue: ['M4', 'M5'], consumer: ['prefetch=3', '3/3 slots'] },
+    badges: { consumer: ['prefetch=3', '3/3 slots'] },
     activeEdges: ['q-c'],
-    msgs: [
-      { id: 'm1', ...ctr('consumer', -12, -10), color: BLUE, label: 'M1', visible: true },
-      { id: 'm2', ...ctr('consumer', 0, 0), color: BLUE, label: 'M2', visible: true },
-      { id: 'm3', ...ctr('consumer', 12, 10), color: BLUE, label: 'M3', visible: true },
-    ],
+    msgs: [],
+    dockedMsgs: {
+      queue: [
+        { label: 'M4', color: BLUE },
+        { label: 'M5', color: BLUE },
+      ],
+      consumer: [
+        { label: 'M1', color: BLUE },
+        { label: 'M2', color: BLUE },
+        { label: 'M3', color: BLUE },
+      ],
+    },
   },
   {
     annotation:
       'Consumer ACKs M2 — one slot freed, broker immediately dispatches M4 (window slides forward)',
     highlights: { queue: 'warning', consumer: 'warning' },
-    badges: { queue: ['M5'], consumer: ['prefetch=3', '3/3 slots'] },
+    badges: { consumer: ['prefetch=3', '3/3 slots'] },
     activeEdges: ['q-c'],
-    msgs: [
-      { id: 'm1', ...ctr('consumer', -12, -10), color: BLUE, label: 'M1', visible: true },
-      { id: 'm3', ...ctr('consumer', 12, 10), color: BLUE, label: 'M3', visible: true },
-      { id: 'm4', ...along(0.5), color: BLUE, label: 'M4', visible: true },
-    ],
+    msgs: [{ id: 'm4', ...along(0.5), color: BLUE, label: 'M4', visible: true }],
+    dockedMsgs: {
+      queue: [{ label: 'M5', color: BLUE }],
+      consumer: [
+        { label: 'M1', color: BLUE },
+        { label: 'M3', color: BLUE },
+      ],
+    },
   },
   {
     annotation: 'Consumer crashes — M1, M3, M4 instantly requeued to queue head, no timeout needed',
     highlights: { queue: 'warning', consumer: 'error' },
-    badges: { queue: ['M1', 'M3', 'M4', 'M5'], consumer: [] },
+    badges: {},
     activeEdges: [],
-    msgs: [
-      { id: 'm1', ...ctr('queue', -10, -8), color: ORANGE, label: 'M1', visible: true },
-      { id: 'm3', ...ctr('queue', 0, 0), color: ORANGE, label: 'M3', visible: true },
-      { id: 'm4', ...ctr('queue', 10, 8), color: ORANGE, label: 'M4', visible: true },
-    ],
+    msgs: [],
+    dockedMsgs: {
+      queue: [
+        { label: 'M1', color: ORANGE },
+        { label: 'M3', color: ORANGE },
+        { label: 'M4', color: ORANGE },
+        { label: 'M5', color: BLUE },
+      ],
+    },
   },
   {
     annotation:
       'New consumer connects with prefetch=3 — picks up from queue head, at-least-once delivery',
     highlights: { queue: 'idle', consumer: 'success' },
-    badges: { queue: [], consumer: ['prefetch=3'] },
+    badges: { consumer: ['prefetch=3'] },
     activeEdges: ['q-c'],
-    msgs: [
-      { id: 'm1', ...ctr('consumer', -12, -10), color: GREEN, label: 'M1', visible: true },
-      { id: 'm3', ...ctr('consumer', 0, 0), color: GREEN, label: 'M3', visible: true },
-      { id: 'm4', ...ctr('consumer', 12, 10), color: GREEN, label: 'M4', visible: true },
-    ],
+    msgs: [],
+    dockedMsgs: {
+      consumer: [
+        { label: 'M1', color: GREEN },
+        { label: 'M3', color: GREEN },
+        { label: 'M4', color: GREEN },
+      ],
+    },
   },
 ]
 
@@ -122,6 +140,7 @@ export function useRabbitMQInFlight(): Result {
         ...n,
         highlight: (step.highlights[n.id] ?? 'idle') as Highlight,
         badge: step.badges[n.id],
+        dockedMsgs: step.dockedMsgs[n.id],
       })),
     [step],
   )

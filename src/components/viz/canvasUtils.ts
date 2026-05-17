@@ -5,6 +5,8 @@ export const NODE_H = 54
 
 export type Highlight = 'success' | 'error' | 'warning' | 'idle'
 
+export type DockedMsg = { label: string; color: string }
+
 export type CanvasNode = {
   id: string
   x: number
@@ -12,7 +14,8 @@ export type CanvasNode = {
   label: string
   kind: NodeKind
   highlight?: Highlight
-  badge?: string[]
+  badge?: string[] // config/metadata labels — rendered inside node
+  dockedMsgs?: DockedMsg[] // message tokens in arrival order — rendered below node
 }
 
 export type CanvasEdge = {

@@ -1,20 +1,16 @@
 import { useMemo } from 'react'
 import { useSteppedAnimation } from './useSteppedAnimation'
-import { nodeCenter, NODE_W, NODE_H } from '../components/viz/canvasUtils'
-import type { CanvasNode, CanvasEdge, FlyingMsg } from '../components/viz/canvasUtils'
+import type { CanvasNode, CanvasEdge, FlyingMsg, DockedMsg } from '../components/viz/canvasUtils'
 import type { NodeKind } from '../types'
 
 export const CANVAS_W = 1000
-export const CANVAS_H = 560
+export const CANVAS_H = 580
 
 type Highlight = 'success' | 'error' | 'warning' | 'idle'
 
 const BLUE = '#56a8f5'
 const GREEN = '#6aab73'
 const PURPLE = '#c77dbb'
-
-void NODE_W
-void NODE_H
 
 const BASE = [
   { id: 'producer', x: 30, y: 253, label: 'Producer', kind: 'producer' as NodeKind },
@@ -25,17 +21,20 @@ const BASE = [
   { id: 'gb2', x: 740, y: 450, label: 'Group B · C2', kind: 'consumer' as NodeKind },
 ]
 
-function ctr(id: string, dx = 0, dy = 0) {
-  const n = BASE.find((b) => b.id === id)!
-  const c = nodeCenter(n.x, n.y)
-  return { x: c.x + dx, y: c.y + dy }
-}
+const EDGES: CanvasEdge[] = [
+  { id: 'p-t', from: 'producer', to: 'topic', color: BLUE },
+  { id: 't-ga1', from: 'topic', to: 'ga1', color: GREEN },
+  { id: 't-ga2', from: 'topic', to: 'ga2', color: GREEN },
+  { id: 't-gb1', from: 'topic', to: 'gb1', color: PURPLE },
+  { id: 't-gb2', from: 'topic', to: 'gb2', color: PURPLE },
+]
 
 type Step = {
   annotation: string
   highlights: Record<string, Highlight>
   activeEdges: string[]
   msgs: FlyingMsg[]
+  dockedMsgs: Record<string, DockedMsg[]>
 }
 
 const STEPS: Step[] = [
@@ -50,7 +49,8 @@ const STEPS: Step[] = [
       gb2: 'idle',
     },
     activeEdges: ['p-t'],
-    msgs: [{ id: 'm', ...ctr('producer'), color: BLUE, label: 'M', visible: true }],
+    msgs: [],
+    dockedMsgs: { producer: [{ label: 'M', color: BLUE }] },
   },
   {
     annotation: 'Message lands in the topic',
@@ -63,7 +63,8 @@ const STEPS: Step[] = [
       gb2: 'idle',
     },
     activeEdges: ['p-t'],
-    msgs: [{ id: 'm', ...ctr('topic'), color: BLUE, label: 'M', visible: true }],
+    msgs: [],
+    dockedMsgs: { topic: [{ label: 'M', color: BLUE }] },
   },
   {
     annotation: 'Group A reads the message — one consumer per partition gets it',
@@ -76,11 +77,12 @@ const STEPS: Step[] = [
       gb2: 'idle',
     },
     activeEdges: ['t-ga1', 't-ga2'],
-    msgs: [
-      { id: 'm', ...ctr('topic'), color: BLUE, label: 'M', visible: true },
-      { id: 'ga1m', ...ctr('ga1'), color: GREEN, label: 'M', visible: true },
-      { id: 'ga2m', ...ctr('ga2'), color: GREEN, label: 'M', visible: true },
-    ],
+    msgs: [],
+    dockedMsgs: {
+      topic: [{ label: 'M', color: BLUE }],
+      ga1: [{ label: 'M', color: GREEN }],
+      ga2: [{ label: 'M', color: GREEN }],
+    },
   },
   {
     annotation: 'Group B also gets the same message — completely independent offset',
@@ -93,13 +95,14 @@ const STEPS: Step[] = [
       gb2: 'warning',
     },
     activeEdges: ['t-gb1', 't-gb2'],
-    msgs: [
-      { id: 'm', ...ctr('topic'), color: BLUE, label: 'M', visible: true },
-      { id: 'ga1m', ...ctr('ga1'), color: GREEN, label: 'M', visible: true },
-      { id: 'ga2m', ...ctr('ga2'), color: GREEN, label: 'M', visible: true },
-      { id: 'gb1m', ...ctr('gb1'), color: PURPLE, label: 'M', visible: true },
-      { id: 'gb2m', ...ctr('gb2'), color: PURPLE, label: 'M', visible: true },
-    ],
+    msgs: [],
+    dockedMsgs: {
+      topic: [{ label: 'M', color: BLUE }],
+      ga1: [{ label: 'M', color: GREEN }],
+      ga2: [{ label: 'M', color: GREEN }],
+      gb1: [{ label: 'M', color: PURPLE }],
+      gb2: [{ label: 'M', color: PURPLE }],
+    },
   },
   {
     annotation:
@@ -113,21 +116,14 @@ const STEPS: Step[] = [
       gb2: 'success',
     },
     activeEdges: [],
-    msgs: [
-      { id: 'ga1m', ...ctr('ga1'), color: GREEN, label: 'M', visible: true },
-      { id: 'ga2m', ...ctr('ga2'), color: GREEN, label: 'M', visible: true },
-      { id: 'gb1m', ...ctr('gb1'), color: PURPLE, label: 'M', visible: true },
-      { id: 'gb2m', ...ctr('gb2'), color: PURPLE, label: 'M', visible: true },
-    ],
+    msgs: [],
+    dockedMsgs: {
+      ga1: [{ label: 'M', color: GREEN }],
+      ga2: [{ label: 'M', color: GREEN }],
+      gb1: [{ label: 'M', color: PURPLE }],
+      gb2: [{ label: 'M', color: PURPLE }],
+    },
   },
-]
-
-const EDGES: CanvasEdge[] = [
-  { id: 'p-t', from: 'producer', to: 'topic', color: BLUE },
-  { id: 't-ga1', from: 'topic', to: 'ga1', color: GREEN },
-  { id: 't-ga2', from: 'topic', to: 'ga2', color: GREEN },
-  { id: 't-gb1', from: 'topic', to: 'gb1', color: PURPLE },
-  { id: 't-gb2', from: 'topic', to: 'gb2', color: PURPLE },
 ]
 
 type Result = {
@@ -151,6 +147,7 @@ export function useConsumerGroups(): Result {
       BASE.map((n) => ({
         ...n,
         highlight: (step.highlights[n.id] ?? 'idle') as Highlight,
+        dockedMsgs: step.dockedMsgs[n.id],
       })),
     [step],
   )

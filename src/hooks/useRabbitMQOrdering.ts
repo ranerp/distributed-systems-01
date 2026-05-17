@@ -1,14 +1,10 @@
 import { useMemo } from 'react'
 import { useSteppedAnimation } from './useSteppedAnimation'
-import { nodeCenter, NODE_W, NODE_H } from '../components/viz/canvasUtils'
-import type { CanvasNode, CanvasEdge, FlyingMsg } from '../components/viz/canvasUtils'
+import type { CanvasNode, CanvasEdge, FlyingMsg, DockedMsg } from '../components/viz/canvasUtils'
 import type { NodeKind } from '../types'
 
-void NODE_W
-void NODE_H
-
 export const CANVAS_W = 880
-export const CANVAS_H = 380
+export const CANVAS_H = 400
 
 const BLUE = '#56a8f5'
 const GREEN = '#6aab73'
@@ -27,12 +23,6 @@ const EDGES: CanvasEdge[] = [
   { id: 'b-db', from: 'consumerB', to: 'db', color: GREEN },
 ]
 
-function ctr(id: string, dx = 0, dy = 0) {
-  const n = BASE.find((b) => b.id === id)!
-  const c = nodeCenter(n.x, n.y)
-  return { x: c.x + dx, y: c.y + dy }
-}
-
 type Highlight = 'success' | 'error' | 'warning' | 'idle'
 
 type Step = {
@@ -41,6 +31,7 @@ type Step = {
   badges: Record<string, string[]>
   activeEdges: string[]
   msgs: FlyingMsg[]
+  dockedMsgs: Record<string, DockedMsg[]>
 }
 
 const STEPS: Step[] = [
@@ -48,21 +39,31 @@ const STEPS: Step[] = [
     annotation:
       'prefetch=1 — broker waits for ACK before sending M2. One message at a time, strict order guaranteed.',
     highlights: { queue: 'warning', consumerA: 'warning', consumerB: 'idle', db: 'idle' },
-    badges: { queue: ['M2', 'M3'], consumerA: ['prefetch=1'] },
+    badges: { consumerA: ['prefetch=1'] },
     activeEdges: ['q-a'],
-    msgs: [{ id: 'm1', ...ctr('consumerA'), color: BLUE, label: 'M1', visible: true }],
+    msgs: [],
+    dockedMsgs: {
+      queue: [
+        { label: 'M2', color: BLUE },
+        { label: 'M3', color: BLUE },
+      ],
+      consumerA: [{ label: 'M1', color: BLUE }],
+    },
   },
   {
     annotation:
       'prefetch=3 + async handler — broker delivers M1, M2, M3 simultaneously to the same consumer',
     highlights: { queue: 'idle', consumerA: 'warning', consumerB: 'idle', db: 'idle' },
-    badges: { queue: [], consumerA: ['prefetch=3', 'async'] },
+    badges: { consumerA: ['prefetch=3', 'async'] },
     activeEdges: ['q-a'],
-    msgs: [
-      { id: 'm1', ...ctr('consumerA', -10, -10), color: BLUE, label: 'M1', visible: true },
-      { id: 'm2', ...ctr('consumerA', 0, 0), color: BLUE, label: 'M2', visible: true },
-      { id: 'm3', ...ctr('consumerA', 10, 10), color: BLUE, label: 'M3', visible: true },
-    ],
+    msgs: [],
+    dockedMsgs: {
+      consumerA: [
+        { label: 'M1', color: BLUE },
+        { label: 'M2', color: BLUE },
+        { label: 'M3', color: BLUE },
+      ],
+    },
   },
   {
     annotation:
@@ -70,33 +71,46 @@ const STEPS: Step[] = [
     highlights: { queue: 'idle', consumerA: 'warning', consumerB: 'idle', db: 'warning' },
     badges: { consumerA: ['prefetch=3', 'async'] },
     activeEdges: ['a-db'],
-    msgs: [
-      { id: 'm1', ...ctr('consumerA', -8, -8), color: BLUE, label: 'M1', visible: true },
-      { id: 'm3', ...ctr('consumerA', 8, 8), color: BLUE, label: 'M3', visible: true },
-      { id: 'm2', ...ctr('db'), color: GREEN, label: 'M2', visible: true },
-    ],
+    msgs: [],
+    dockedMsgs: {
+      consumerA: [
+        { label: 'M1', color: BLUE },
+        { label: 'M3', color: BLUE },
+      ],
+      db: [{ label: 'M2', color: GREEN }],
+    },
   },
   {
     annotation:
       'Multiple consumers — broker distributes M1 to A, M2 to B with no coordination between them',
     highlights: { queue: 'warning', consumerA: 'warning', consumerB: 'warning', db: 'idle' },
-    badges: { queue: ['M3', 'M4'], consumerA: ['prefetch=1'], consumerB: ['prefetch=1'] },
+    badges: { consumerA: ['prefetch=1'], consumerB: ['prefetch=1'] },
     activeEdges: ['q-a', 'q-b'],
-    msgs: [
-      { id: 'm1', ...ctr('consumerA'), color: BLUE, label: 'M1', visible: true },
-      { id: 'm2', ...ctr('consumerB'), color: BLUE, label: 'M2', visible: true },
-    ],
+    msgs: [],
+    dockedMsgs: {
+      queue: [
+        { label: 'M3', color: BLUE },
+        { label: 'M4', color: BLUE },
+      ],
+      consumerA: [{ label: 'M1', color: BLUE }],
+      consumerB: [{ label: 'M2', color: BLUE }],
+    },
   },
   {
     annotation:
       'Consumer B finishes M2 first — DB receives M2 before M1. Global ordering is gone regardless of prefetch.',
     highlights: { queue: 'warning', consumerA: 'warning', consumerB: 'success', db: 'warning' },
-    badges: { queue: ['M3', 'M4'] },
+    badges: {},
     activeEdges: ['b-db'],
-    msgs: [
-      { id: 'm1', ...ctr('consumerA'), color: BLUE, label: 'M1', visible: true },
-      { id: 'm2', ...ctr('db'), color: GREEN, label: 'M2', visible: true },
-    ],
+    msgs: [],
+    dockedMsgs: {
+      queue: [
+        { label: 'M3', color: BLUE },
+        { label: 'M4', color: BLUE },
+      ],
+      consumerA: [{ label: 'M1', color: BLUE }],
+      db: [{ label: 'M2', color: GREEN }],
+    },
   },
 ]
 
@@ -122,6 +136,7 @@ export function useRabbitMQOrdering(): Result {
         ...n,
         highlight: (step.highlights[n.id] ?? 'idle') as Highlight,
         badge: step.badges[n.id],
+        dockedMsgs: step.dockedMsgs[n.id],
       })),
     [step],
   )
